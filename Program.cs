@@ -10,15 +10,6 @@ namespace Model
     {
         static void Main(string[] args)
         {
-            IConfiguration config = new ConfigurationBuilder()
-                                    .AddJsonFile("appsettings.json")
-                                    .Build();
-
-            DataContextDapper dapper = new DataContextDapper(config);
-
-            DataContextEF entityFramework = new DataContextEF(config);
-            // DateTime rightnow = dapper.LoadDataSingle<DateTime>("SELECT GETDATE()");
-            // Console.WriteLine(rightnow);
             
             Computer myComputer = new Computer()
             {
@@ -31,7 +22,7 @@ namespace Model
             };
 
             string sqlInsert = @"INSERT INTO TutorialAppSchema.Computer(
-                 Motherboard ,
+                Motherboard ,
                 HasWifi,
                 HasLTE,
                 ReleaseDate,
@@ -44,42 +35,19 @@ namespace Model
                + "','" + myComputer.Price
                 + "','" + myComputer.VideoCard
              + "')";
+            //Overwrites the text previously created
+            File.WriteAllText("log.txt","\n" + sqlInsert + "\n"); 
 
-            // Console.WriteLine(sqlInsert);
-        //    int result = dapper.ExecuteSqlWithRowCount(sqlInsert);
-            bool result = dapper.ExecuteSql(sqlInsert);
-        //    Console.WriteLine(result);
-            entityFramework.Add(myComputer);
-            entityFramework.SaveChanges();
-            string sqlSelect = @"SELECT 
-                Computer.Motherboard ,
-                Computer.HasWifi,
-                Computer.HasLTE,
-                Computer.ReleaseDate,
-                Computer.Price,
-                Computer.VideoCard
-                FROM TutorialAppSchema.Computer";
+            //Appends the text to the previous log
+            using StreamWriter openFile = new ("log.txt",append:true);
 
-            IEnumerable<Computer> computers = dapper.LoadData<Computer>(sqlSelect);
+            openFile.WriteLine("\n" + sqlInsert + "\n");
 
-            foreach(Computer singleComputer in computers){
-                Console.WriteLine(singleComputer.Motherboard);
-            }
+            openFile.Close();
 
-            IEnumerable<Computer>? computersEf = entityFramework.Computer?.ToList<Computer>();
-            if(computersEf != null)
-            {
-                foreach(Computer singleComputer in computersEf){
-                    Console.WriteLine(" From EF Query'"+singleComputer.Motherboard +"'");
-                }
-            }
- 
+            string logFileText = File.ReadAllText("log.txt");
 
-            // myComputer.HasLTE = true;
-            // Console.WriteLine(myComputer.Motherboard);
-            // Console.WriteLine(myComputer.CPUCores);
-            // Console.WriteLine(myComputer.ReleaseDate);
-            // Console.WriteLine(myComputer.HasLTE);
+            Console.WriteLine(logFileText);
         }
     }
 }

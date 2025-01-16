@@ -1,0 +1,19 @@
+
+INSERT INTO TutorialAppSchema.Computer(
+                Motherboard ,
+                HasWifi,
+                HasLTE,
+                ReleaseDate,
+                Price,
+                VideoCard
+             ) VALUES ('HP', 'True','False','2025-01-16','84734.13','GEFORCE RTX')
+
+INSERT INTO TutorialAppSchema.Computer(
+                Motherboard ,
+                HasWifi,
+                HasLTE,
+                ReleaseDate,
+                Price,
+                VideoCard
+             ) VALUES ('HP', 'True','False','2025-01-16','84734.13','GEFORCE RTX')
+
