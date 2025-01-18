@@ -74,3 +74,5 @@ C:\Users\Amoghavarsh Desai\dotnet-course\Model\bin\Debug\net9.0\Microsoft.Extens
 C:\Users\Amoghavarsh Desai\dotnet-course\Model\bin\Debug\net9.0\Microsoft.Extensions.FileProviders.Physical.dll
 C:\Users\Amoghavarsh Desai\dotnet-course\Model\bin\Debug\net9.0\Microsoft.Extensions.FileSystemGlobbing.dll
 C:\Users\Amoghavarsh Desai\dotnet-course\Model\bin\Debug\net9.0\appsettings.json
+C:\Users\Amoghavarsh Desai\dotnet-course\Model\obj\Debug\net9.0\Model.sourcelink.json
+C:\Users\Amoghavarsh Desai\dotnet-course\Model\bin\Debug\net9.0\Newtonsoft.Json.dll
