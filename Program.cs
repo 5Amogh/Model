@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using System.Text.Json;
+using AutoMapper;
 using Microsoft.Extensions.Configuration;
 using Model.Data;
 using Model.Models;
@@ -17,56 +18,63 @@ namespace Model
 
             DataContextDapper dapper = new DataContextDapper(config);
 
-            string computerJson = File.ReadAllText("Computers.json");
+            string computerJson = File.ReadAllText("ComputersSnake.json");
 
-            JsonSerializerOptions jsonOptions = new JsonSerializerOptions()
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-            // By using Sytem.text.json
-            // IEnumerable<Computer>? computers = JsonSerializer.Deserialize<IEnumerable<Computer>>(computerJson, jsonOptions);
-            //  By using Newtonsoft.json package  
-            IEnumerable<Computer>? computers = JsonConvert.DeserializeObject<IEnumerable<Computer>>(computerJson);
+            Mapper mapper = new Mapper(new MapperConfiguration((cfg)=> {
+                cfg.CreateMap<ComputersSnake,Computer>()
+                .ForMember(destination => destination.ComputerId, options =>
+                options.MapFrom(source => source.computer_id))
+                .ForMember(destination => destination.Motherboard, options =>
+                options.MapFrom(source => source.motherboard))
+                .ForMember(destination => destination.VideoCard, options =>
+                options.MapFrom(source => source.video_card))
+                .ForMember(destination => destination.HasWifi, options =>
+                options.MapFrom(source => source.has_wifi))
+                .ForMember(destination => destination.HasLTE, options =>
+                options.MapFrom(source => source.has_lte))
+                .ForMember(destination => destination.ReleaseDate, options =>
+                options.MapFrom(source => source.release_date))
+                 .ForMember(destination => destination.CPUCores, options =>
+                options.MapFrom(source => source.cpu_cores))
+                .ForMember(destination => destination.Price, options =>
+                options.MapFrom(source => source.price));
+            }));
 
+            IEnumerable<ComputersSnake>? computersSystem = System.Text.Json.JsonSerializer.Deserialize<IEnumerable<ComputersSnake>>(computerJson);
+            
+            if(computersSystem != null){
+                IEnumerable<Computer> computerResult = mapper.Map<IEnumerable<Computer>>(computersSystem);
 
-            JsonSerializerSettings settings = new JsonSerializerSettings()
-            {
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
-            };
-            string computersCopyNewtonSoft = JsonConvert.SerializeObject(computers,settings);
-
-            File.WriteAllText("computersCopyNewtonSoft.json",computersCopyNewtonSoft);
-
-            string computersCopySystem = System.Text.Json.JsonSerializer.Serialize(computers,jsonOptions);
-
-            File.WriteAllText("computersCopySystem.json",computersCopySystem);
-
-            if(computers != null)
-            {
-                foreach(Computer computer in computers)
-                {
-
-                    string? releaseDate = computer.ReleaseDate.HasValue ? computer.ReleaseDate.Value.ToString("yyyy-MM-dd") :  null;
-                    string sqlInsert = @"INSERT INTO TutorialAppSchema.Computer(
-                                        Motherboard ,
-                                        HasWifi,
-                                        HasLTE,
-                                        ReleaseDate,
-                                        Price,
-                                        VideoCard
-                                    ) VALUES ('" + EscapeSingleQuote(computer.Motherboard)
-                                    + "', '" + computer.HasWifi
-                                    + "','" + computer.HasLTE
-                                    + "','" + releaseDate
-                                    + "','" + computer.Price
-                                    + "','" + EscapeSingleQuote(computer.VideoCard)
-                                    + "')";                
-                
-                                dapper.ExecuteSql(sqlInsert);
-
+                foreach(Computer computer in computerResult){
+                    Console.WriteLine(computer.Motherboard);
                 }
-
             }
+            // if(computers != null)
+            // {
+            //     foreach(Computer computer in computers)
+            //     {
+
+            //         string? releaseDate = computer.ReleaseDate.HasValue ? computer.ReleaseDate.Value.ToString("yyyy-MM-dd") :  null;
+            //         string sqlInsert = @"INSERT INTO TutorialAppSchema.Computer(
+            //                             Motherboard ,
+            //                             HasWifi,
+            //                             HasLTE,
+            //                             ReleaseDate,
+            //                             Price,
+            //                             VideoCard
+            //                         ) VALUES ('" + EscapeSingleQuote(computer.Motherboard)
+            //                         + "', '" + computer.HasWifi
+            //                         + "','" + computer.HasLTE
+            //                         + "','" + releaseDate
+            //                         + "','" + computer.Price
+            //                         + "','" + EscapeSingleQuote(computer.VideoCard)
+            //                         + "')";                
+                
+            //                     dapper.ExecuteSql(sqlInsert);
+
+            //     }
+
+            // }
             // Computer myComputer = new Computer()
             // {
             //     Motherboard = "HP",
@@ -91,19 +99,6 @@ namespace Model
             //    + "','" + myComputer.Price
             //     + "','" + myComputer.VideoCard
             //  + "')";
-            //Overwrites the text previously created
-            // File.WriteAllText("log.txt","\n" + sqlInsert + "\n"); 
-
-            // //Appends the text to the previous log
-            // using StreamWriter openFile = new ("log.txt",append:true);
-
-            // openFile.WriteLine("\n" + sqlInsert + "\n");
-
-            // openFile.Close();
-
-            // string logFileText = File.ReadAllText("log.txt");
-
-            // Console.WriteLine(logFileText);
         }
 
         static string EscapeSingleQuote(string input)
